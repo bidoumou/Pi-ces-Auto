@@ -1,6 +1,20 @@
-// Récupération des pièces depuis le fichier JSON
-const reponse = await fetch("pieces-autos.json");
-const pieces = await reponse.json();
+import { ajoutListenersAvis, ajoutListenerEnvoyerAvis, afficherAvis} from "./avis.js";
+
+let pieces = window.localStorage.getItem("pieces");
+
+if(pieces === null){
+    const reponse = await fetch("http://localhost:8081/pieces");
+    pieces = await reponse.json();
+    const valeurPieces = JSON.stringify(pieces);
+    window.localStorage.setItem("pieces", valeurPieces);
+}
+else{
+    pieces = JSON.parse(pieces);
+}
+
+window.localStorage.setItem("nom", "Les Bonnes Pièces !");
+
+ajoutListenerEnvoyerAvis();
 
 
 function genererPieces(pieces){
@@ -25,6 +39,10 @@ function genererPieces(pieces){
     
         const dispoElement = document.createElement("p");
         dispoElement.innerText = article.disponibilite ? "En stock" : "Rupture de stock";
+
+        const avisBouton = document.createElement("button");
+        avisBouton.dataset.id = article.id;
+        avisBouton.textContent = "Afficher les avis";
     
         
         sectionFiches.appendChild(pieceElement);
@@ -34,8 +52,13 @@ function genererPieces(pieces){
         pieceElement.appendChild(categorieElement);
         pieceElement.appendChild(descriptionElement);
         pieceElement.appendChild(dispoElement);
+        pieceElement.appendChild(avisBouton);
     }
+
+    ajoutListenersAvis();
 }
+
+
 
 function btnFiltres() {
 
@@ -81,7 +104,7 @@ function btnFiltres() {
     });
 
     const inputPrixMax = document.querySelector("#prix-max");
-    inputPrixMax.addEventListener("input", () =>{
+    inputPrixMax.addEventListener("input", () => {
         const piecesFiltrees = pieces.filter(function (piece){
             return piece.prix <= inputPrixMax.value;
         });
@@ -122,11 +145,32 @@ function affichageProduitsSpe(pieces) {
     document.querySelector(".enStock").appendChild(enStockElement);
 }
 
+function majPieces(){
+    const boutonMettreAJour = document.querySelector(".btn-maj");
+    boutonMettreAJour.addEventListener("click", () => {
+        window.localStorage.removeItem("pieces");
+    });
+}
+
 
 function main(pieces){
     genererPieces(pieces);
+
+    for(let i = 0; i < pieces.length; i++){
+        const id = pieces[i].id;
+        const avisJSON = window.localStorage.getItem(`avis-id="${id}`);
+        const avis = JSON.parse(avisJSON);
+
+        if(avis !== null){
+            const pieceElement = document.querySelector(`article[data-id="${id}"]`);
+            afficherAvis(pieceElement, avis);
+        }
+    }
+
     btnFiltres();
     affichageProduitsSpe(pieces);
+    majPieces();
+    
 }
 
 main(pieces);
