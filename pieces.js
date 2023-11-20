@@ -1,4 +1,4 @@
-import { ajoutListenersAvis, ajoutListenerEnvoyerAvis, afficherAvis} from "./avis.js";
+import { ajoutListenersAvis, ajoutListenerEnvoyerAvis, afficherAvis, afficherGraphiqueAvis} from "./avis.js";
 
 let pieces = window.localStorage.getItem("pieces");
 
@@ -174,3 +174,4 @@ function main(pieces){
 }
 
 main(pieces);
+await afficherGraphiqueAvis();
