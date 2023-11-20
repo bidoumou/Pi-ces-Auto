@@ -20,5 +20,12 @@
   "dependencies": {
     "chart.js": "^4.4.0",
     "http-server": "^14.1.1"
-  }
+  },
+  "devDependencies": {
+    "eslint": "^8.54.0"
+  },
+  "scripts": {
+    "dev": "http-server",
+    "lint": "eslint *.js"
+   }
 }
